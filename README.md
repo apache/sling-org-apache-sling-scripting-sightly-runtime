@@ -6,4 +6,4 @@
 
 This module is part of the [Apache Sling](https://sling.apache.org) project.
 
-The Apache Sling Scripting HTL Runtime provides support for executing HTL Java compiled units produced by the [`org.apache.sling.scripting.sightly.compiler.java module`](https://github.com/apache/sling-org-apache-sling-scripting-sightly-runtime).
+The Apache Sling Scripting HTL Runtime provides support for executing HTL Java compiled units produced by the [`org.apache.sling.scripting.sightly.compiler.java module`](https://github.com/apache/sling-org-apache-sling-scripting-sightly-compiler-java).
