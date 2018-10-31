@@ -99,7 +99,7 @@ public interface RuntimeExtension {
      * </p>
      * <ol>
      *     <li>the original string to escape / filter</li>
-     *     <li>the context to be applied - see {@link org.apache.sling.scripting.sightly.compiler.expression.MarkupContext}</li>
+     *     <li>the context to be applied</li>
      * </ol>
      * <p>
      *     For more details check https://github.com/Adobe-Marketing-Cloud/htl-spec/blob/1.2/SPECIFICATION.md#121-display-context.
