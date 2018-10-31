@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.apache.sling</groupId>
         <artifactId>sling</artifactId>
-        <version>30</version>
+        <version>34</version>
         <relativePath />
     </parent>
 
@@ -159,6 +159,13 @@
     <!-- D E P E N D E N C I E S                                                 -->
     <!-- ======================================================================= -->
     <dependencies>
+
+        <!-- OSGi -->
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.annotation.versioning</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- Logging -->
         <dependency>
