@@ -118,10 +118,10 @@ public final class ObjectModel {
                     resolved = ((Map) target).get(property);
                 }
                 if (resolved == null) {
-                    resolved = getField(target, propertyName);
+                    resolved = invokeBeanMethod(target, propertyName);
                 }
                 if (resolved == null) {
-                    resolved = invokeBeanMethod(target, propertyName);
+                    resolved = getField(target, propertyName);
                 }
             }
         }
