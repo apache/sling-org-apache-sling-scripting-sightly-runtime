@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -112,16 +113,23 @@ public final class ObjectModel {
             resolved = getIndex(target, ((Number) property).intValue());
         }
         if (resolved == null) {
-            String propertyName = toString(property);
-            if (StringUtils.isNotEmpty(propertyName)) {
-                if (target instanceof Map) {
-                    resolved = ((Map) target).get(property);
+            if (target instanceof Optional) {
+                Optional optionalTarget = (Optional) target;
+                if (optionalTarget.isPresent()) {
+                    resolved = resolveProperty(optionalTarget.get(), property);
                 }
-                if (resolved == null) {
-                    resolved = getField(target, propertyName);
-                }
-                if (resolved == null) {
-                    resolved = invokeBeanMethod(target, propertyName);
+            } else {
+                String propertyName = toString(property);
+                if (StringUtils.isNotEmpty(propertyName)) {
+                    if (target instanceof Map) {
+                        resolved = ((Map) target).get(property);
+                    }
+                    if (resolved == null) {
+                        resolved = getField(target, propertyName);
+                    }
+                    if (resolved == null) {
+                        resolved = invokeBeanMethod(target, propertyName);
+                    }
                 }
             }
         }
@@ -177,6 +185,10 @@ public final class ObjectModel {
             return ((Iterator<?>) object).hasNext();
         }
 
+        if (object instanceof Optional) {
+            return (boolean) (((Optional) object).map(ObjectModel::toBoolean)).orElse(false);
+        }
+
         return !(object instanceof Object[]) || ((Object[]) object).length > 0;
     }
 
@@ -195,6 +207,10 @@ public final class ObjectModel {
         if (object instanceof Number) {
             return (Number) object;
         }
+        if (object instanceof Optional) {
+            return (Number) (((Optional) object).map(ObjectModel::toNumber)).orElse(null);
+        }
+
         String stringValue = toString(object);
         try {
             return NumberUtils.createNumber(stringValue);
@@ -227,7 +243,10 @@ public final class ObjectModel {
                 output = object.toString();
             } else if (object instanceof Enum) {
                 return ((Enum) object).name();
-            } else {
+            } else if (object instanceof Optional) {
+                return  toString(((Optional) object).map(ObjectModel::toString).orElse(output));
+            }
+            else {
                 Collection<?> col = toCollection(object);
                 output = collectionToString(col);
             }
@@ -268,6 +287,9 @@ public final class ObjectModel {
                 list.add(Array.get(object, i));
             }
             return list;
+        }
+        if (object instanceof Optional) {
+            return toCollection(((Optional) object).map(ObjectModel::toCollection).orElse(null));
         }
         if (object instanceof Collection) {
             return (Collection<Object>) object;
