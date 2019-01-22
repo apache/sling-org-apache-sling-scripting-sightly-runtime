@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Vector;
 
 import org.apache.sling.scripting.sightly.render.testobjects.Person;
@@ -72,6 +73,14 @@ public class ObjectModelTest {
         assertTrue(ObjectModel.toBoolean(new Bag<>(testArray)));
         assertFalse(ObjectModel.toBoolean(new Bag<>(new Integer[]{})));
         assertTrue(ObjectModel.toBoolean(new Date()));
+
+        assertFalse(ObjectModel.toBoolean(Optional.empty()));
+        assertFalse(ObjectModel.toBoolean(Optional.of("")));
+        assertFalse(ObjectModel.toBoolean(Optional.of(false)));
+        assertFalse(ObjectModel.toBoolean(Optional.ofNullable(null)));
+        assertTrue(ObjectModel.toBoolean(Optional.of(true)));
+        assertTrue(ObjectModel.toBoolean(Optional.of("pass")));
+        assertTrue(ObjectModel.toBoolean(Optional.of(1)));
     }
 
     @Test
@@ -80,6 +89,14 @@ public class ObjectModelTest {
         assertEquals(1, ObjectModel.toNumber("1"));
         assertNull(ObjectModel.toNumber(null));
         assertNull(ObjectModel.toNumber("1-2"));
+
+        assertNull(ObjectModel.toNumber(Optional.empty()));
+        assertNull(ObjectModel.toNumber(Optional.of(false)));
+        assertNull(ObjectModel.toNumber(Optional.ofNullable(null)));
+        assertNull(ObjectModel.toNumber(Optional.of(true)));
+        assertNull(ObjectModel.toNumber(Optional.of("pass")));
+        assertEquals(1, ObjectModel.toNumber(Optional.of(1)));
+        assertEquals(1, ObjectModel.toNumber(Optional.of("1")));
     }
 
     @Test
@@ -94,6 +111,14 @@ public class ObjectModelTest {
         assertEquals("1,2,3", ObjectModel.toString(testList));
         assertEquals("1,2,3", ObjectModel.toString(testArray));
         assertEquals("1,2,3", ObjectModel.toString(testPrimitiveArray));
+
+        assertEquals("", ObjectModel.toString(Optional.empty()));
+        assertEquals("false", ObjectModel.toString(Optional.of(false)));
+        assertEquals("", ObjectModel.toString(Optional.ofNullable(null)));
+        assertEquals("true", ObjectModel.toString(Optional.of(true)));
+        assertEquals("pass", ObjectModel.toString(Optional.of("pass")));
+        assertEquals("1", ObjectModel.toString(Optional.of(1)));
+        assertEquals("1", ObjectModel.toString(Optional.of("1")));
     }
 
     @Test
@@ -101,7 +126,7 @@ public class ObjectModelTest {
         assertTrue(ObjectModel.toCollection(null).isEmpty());
         assertTrue(ObjectModel.toCollection(new StringBuilder()).isEmpty());
         Integer[] testArray = new Integer[] {1, 2, 3};
-        int[] testPrimitiveArray = new int[]{1, 2, 3};
+        int[] testPrimitiveArray = new int[] {1, 2, 3};
         List<Integer> testList = Arrays.asList(testArray);
         Map<String, Integer> map = new HashMap<String, Integer>() {{
             put("one", 1);
@@ -121,6 +146,12 @@ public class ObjectModelTest {
         assertTrue(stringCollection.size() == 1 && stringCollection.contains(stringObject));
         Collection numberCollection = ObjectModel.toCollection(numberObject);
         assertTrue(numberCollection.size() == 1 && numberCollection.contains(numberObject));
+
+        List<Object> emptyList = Collections.emptyList();
+        assertEquals(emptyList, ObjectModel.toCollection(Optional.empty()));
+        assertEquals(emptyList, ObjectModel.toCollection(Optional.of(Arrays.asList())));
+        List<Integer> list = Arrays.asList(1, 2, 3);
+        assertEquals(list, ObjectModel.toCollection(Optional.of(list)));
     }
 
     @Test
@@ -176,6 +207,15 @@ public class ObjectModelTest {
         assertNull("Expected null result for public method available on implementation but not exposed by interface.", ObjectModel
                 .resolveProperty(johnDoe, "fullName"));
         assertNull("Expected null result for inexistent method.", ObjectModel.resolveProperty(johnDoe, "nomethod"));
+
+        OptionalTest optionalTest = new OptionalTest();
+        assertEquals(Optional.of("string"), ObjectModel.resolveProperty(optionalTest, "string"));
+        assertEquals(Optional.of(1), ObjectModel.resolveProperty(optionalTest, "int"));
+        assertEquals(Optional.of(1), ObjectModel.resolveProperty(Optional.of(optionalTest), "int"));
+        assertEquals(Optional.of(Integer.valueOf(1)), ObjectModel.resolveProperty(optionalTest, "integer"));
+        assertEquals(Optional.of(Integer.valueOf(1)), ObjectModel.resolveProperty(Optional.of(optionalTest), "integer"));
+        assertEquals(null, ObjectModel.resolveProperty(Optional.empty(), "integer"));
+
     }
 
     @Test
@@ -242,4 +282,20 @@ public class ObjectModelTest {
             };
         }
     }
+
+    public class OptionalTest {
+        public Optional<String> getEmpty() {
+            return Optional.empty();
+        }
+        public Optional<String> getString() {
+            return Optional.of("string");
+        }
+        public Optional<Integer> getInt() {
+            return Optional.of(1);
+        }
+        public Optional<Integer> getInteger() {
+            return Optional.of(Integer.valueOf(1));
+        }
+    }
 }
+
