@@ -19,8 +19,11 @@
 package org.apache.sling.scripting.sightly.render;
 
 import java.io.PrintWriter;
+import java.util.AbstractMap;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -103,13 +106,12 @@ public abstract class RenderUnit implements Record<RenderUnit> {
     }
 
     private Bindings buildGlobalScope(Bindings bindings) {
-        SimpleBindings simpleBindings = new SimpleBindings(bindings);
-        simpleBindings.putAll(bindings);
+        CaseInsensitiveBindings caseInsensitiveBindings = new CaseInsensitiveBindings(bindings);
         if (siblings != null) {
-            simpleBindings.putAll(siblings);
+            caseInsensitiveBindings.putAll(siblings);
         }
-        simpleBindings.putAll(subTemplates);
-        return new CaseInsensitiveBindings(simpleBindings);
+        caseInsensitiveBindings.putAll(subTemplates);
+        return caseInsensitiveBindings;
     }
 
     protected static class FluentMap extends HashMap<String, Object> {
@@ -128,11 +130,16 @@ public abstract class RenderUnit implements Record<RenderUnit> {
 
     }
 
-    private static final class CaseInsensitiveBindings extends SimpleBindings {
+    private static final class CaseInsensitiveBindings implements Bindings {
 
-        private CaseInsensitiveBindings(Map<String, Object> m) {
-            for (Entry<String, Object> entry : m.entrySet()) {
-                put(entry.getKey().toLowerCase(), entry.getValue());
+        private final Map<String, Object> wrapped;
+        private final Map<String, String> keyMappings;
+
+        private CaseInsensitiveBindings(Map<String, Object> wrapped) {
+            this.wrapped = wrapped;
+            keyMappings = new HashMap<>();
+            for (String key : this.wrapped.keySet()) {
+                keyMappings.put(key.toLowerCase(), key);
             }
         }
 
@@ -141,7 +148,11 @@ public abstract class RenderUnit implements Record<RenderUnit> {
             if (!(key instanceof String)) {
                 throw new ClassCastException("key should be a String");
             }
-            return super.get(((String) key).toLowerCase());
+            String mappedKey = keyMappings.get(((String) key).toLowerCase());
+            if (mappedKey != null) {
+                return wrapped.get(mappedKey);
+            }
+            return null;
         }
 
         @Override
@@ -149,7 +160,72 @@ public abstract class RenderUnit implements Record<RenderUnit> {
             if (!(key instanceof String)) {
                 throw new ClassCastException("key should be a String");
             }
-            return super.containsKey(((String) key).toLowerCase());
+            return keyMappings.containsKey(((String) key).toLowerCase());
+        }
+
+        @Override
+        public Object put(String key, Object value) {
+            keyMappings.put(key.toLowerCase(), key);
+            return wrapped.put(key, value);
+        }
+
+        @Override
+        public void putAll(Map<? extends String, ?> toMerge) {
+            for (Map.Entry<? extends String, ?> entry : toMerge.entrySet()) {
+                put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        @Override
+        public Object remove(Object key) {
+            if (!(key instanceof String)) {
+                throw new ClassCastException("key should be a String");
+            }
+            String originalKey = keyMappings.remove(((String) key).toLowerCase());
+            if (originalKey != null) {
+                return wrapped.remove(originalKey);
+            }
+            return null;
+        }
+
+        @Override
+        public int size() {
+            return wrapped.size();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return wrapped.isEmpty();
+        }
+
+        @Override
+        public boolean containsValue(Object value) {
+            return wrapped.containsValue(value);
+        }
+
+        @Override
+        public void clear() {
+            wrapped.clear();
+            keyMappings.clear();
+        }
+
+        @Override
+        public Set<String> keySet() {
+            return keyMappings.keySet();
+        }
+
+        @Override
+        public Collection<Object> values() {
+            return wrapped.values();
+        }
+
+        @Override
+        public Set<Entry<String, Object>> entrySet() {
+            Set<Entry<String, Object>> entrySet = new HashSet<>();
+            for (Map.Entry<String, String> entry : keyMappings.entrySet()) {
+                entrySet.add(new AbstractMap.SimpleEntry<>(entry.getKey(), wrapped.get(entry.getValue())));
+            }
+            return entrySet;
         }
     }
 
