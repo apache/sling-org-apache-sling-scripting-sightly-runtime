@@ -106,11 +106,12 @@ public abstract class RenderUnit implements Record<RenderUnit> {
     }
 
     private Bindings buildGlobalScope(Bindings bindings) {
+        CaseInsensitiveBindings caseInsensitiveBindings = new CaseInsensitiveBindings(bindings);
         if (siblings != null) {
-            bindings.putAll(siblings);
+            caseInsensitiveBindings.putAll(siblings);
         }
-        bindings.putAll(subTemplates);
-        return new CaseInsensitiveBindings(bindings);
+        caseInsensitiveBindings.putAll(subTemplates);
+        return caseInsensitiveBindings;
     }
 
     protected static class FluentMap extends HashMap<String, Object> {
