@@ -81,6 +81,17 @@ public class ObjectModelTest {
         assertTrue(ObjectModel.toBoolean(Optional.of(true)));
         assertTrue(ObjectModel.toBoolean(Optional.of("pass")));
         assertTrue(ObjectModel.toBoolean(Optional.of(1)));
+        assertTrue(ObjectModel.toBoolean(new Object()));
+        Map<String, String> map2 = new HashMap<String, String>() {
+            @Override
+            public String toString() {
+                return null;
+            }
+        };
+        assertFalse(ObjectModel.toBoolean(map2));
+        map2.put("one", "entry");
+        assertTrue(ObjectModel.toBoolean(map2));
+
     }
 
     @Test

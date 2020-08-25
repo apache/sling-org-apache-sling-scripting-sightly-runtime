@@ -158,7 +158,10 @@ public final class ObjectModel {
             return !(number.doubleValue() == 0.0);
         }
 
-        String s = object.toString().trim();
+        String s = object.toString();
+        if (s != null) {
+            s = s.trim();
+        }
         if (EMPTY_STRING.equals(s)) {
             return false;
         } else if ("true".equalsIgnoreCase(s) || "false".equalsIgnoreCase(s)) {
