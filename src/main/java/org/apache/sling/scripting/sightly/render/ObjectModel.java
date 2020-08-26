@@ -155,25 +155,28 @@ public final class ObjectModel {
 
         if (object instanceof Number) {
             Number number = (Number) object;
-            return !(number.doubleValue() == 0.0);
+            return number.doubleValue() != 0.0;
         }
 
-        String s = object.toString();
-        if (s != null) {
-            s = s.trim();
-        }
-        if (EMPTY_STRING.equals(s)) {
-            return false;
-        } else if ("true".equalsIgnoreCase(s) || "false".equalsIgnoreCase(s)) {
-            return Boolean.parseBoolean(s);
+        if (object instanceof Boolean) {
+            return Boolean.TRUE.equals(object);
         }
 
-        if (object instanceof Collection) {
-            return ((Collection) object).size() > 0;
+        if (object instanceof String) {
+            String s = (String) object;
+            if (EMPTY_STRING.equals(s)) {
+                return false;
+            } else if ("true".equalsIgnoreCase(s) || "false".equalsIgnoreCase(s)) {
+                return Boolean.parseBoolean(s);
+            }
         }
 
-        if (object instanceof Map) {
-            return ((Map) object).size() > 0;
+        if (object instanceof Collection<?>) {
+            return !((Collection<?>) object).isEmpty();
+        }
+
+        if (object instanceof Map<?, ?>) {
+            return !((Map<?, ?>) object).isEmpty();
         }
 
         if (object instanceof Iterable<?>) {
@@ -184,11 +187,15 @@ public final class ObjectModel {
             return ((Iterator<?>) object).hasNext();
         }
 
-        if (object instanceof Optional) {
-            return toBoolean(((Optional) object).orElse(false));
+        if (object instanceof Optional<?>) {
+            Optional<?> optional = (Optional<?>) object;
+            return optional.filter(ObjectModel::toBoolean).isPresent();
         }
 
-        return !(object instanceof Object[]) || ((Object[]) object).length > 0;
+        if (object.getClass().isArray()) {
+            return Array.getLength(object) > 0;
+        }
+        return true;
     }
 
     /**

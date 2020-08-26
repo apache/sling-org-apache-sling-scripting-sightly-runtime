@@ -48,6 +48,9 @@ public class ObjectModelTest {
         assertFalse(ObjectModel.toBoolean(0));
         assertTrue(ObjectModel.toBoolean(123456));
         assertFalse(ObjectModel.toBoolean(""));
+        assertFalse(ObjectModel.toBoolean(false));
+        assertFalse(ObjectModel.toBoolean(Boolean.FALSE));
+        assertFalse(ObjectModel.toBoolean(new int[0]));
         assertFalse(ObjectModel.toBoolean("FalSe"));
         assertFalse(ObjectModel.toBoolean("false"));
         assertFalse(ObjectModel.toBoolean("FALSE"));
