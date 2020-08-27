@@ -163,12 +163,7 @@ public final class ObjectModel {
         }
 
         if (object instanceof String) {
-            String s = (String) object;
-            if (EMPTY_STRING.equals(s)) {
-                return false;
-            } else if ("true".equalsIgnoreCase(s) || "false".equalsIgnoreCase(s)) {
-                return Boolean.parseBoolean(s);
-            }
+            return StringUtils.isNotBlank((String) object);
         }
 
         if (object instanceof Collection<?>) {
