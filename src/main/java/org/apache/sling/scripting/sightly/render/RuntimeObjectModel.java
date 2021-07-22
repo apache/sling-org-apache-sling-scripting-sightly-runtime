@@ -16,6 +16,7 @@
  ******************************************************************************/
 package org.apache.sling.scripting.sightly.render;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
@@ -94,6 +95,14 @@ public interface RuntimeObjectModel {
      * @return the date represented by the {@code object}
      */
     Date toDate(Object object);
+
+    /**
+     * Convert the given object to a {@link Instant} object
+     *
+     * @param object the target object
+     * @return the date represented by the {@code object}
+     */
+    Instant toInstant(Object object);
 
     /**
      * Convert the given object to a string.
