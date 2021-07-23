@@ -97,7 +97,7 @@ public interface RuntimeObjectModel {
     Date toDate(Object object);
 
     /**
-     * Convert the given object to a {@link Instant} object
+     * Convert the given object to an {@link Instant} object
      *
      * @param object the target object
      * @return the date represented by the {@code object}
