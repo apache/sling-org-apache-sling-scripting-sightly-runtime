@@ -16,6 +16,7 @@
  ******************************************************************************/
 package org.apache.sling.scripting.sightly.render;
 
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
@@ -91,6 +92,19 @@ public class AbstractRuntimeObjectModelTest {
         assertEquals(testDate, runtimeObjectModel.toDate(testDate));
         Calendar testCalendar = Calendar.getInstance();
         assertEquals(testCalendar.getTime(), runtimeObjectModel.toDate(testCalendar));
+        Instant testInstant = Instant.now();
+        assertEquals(Date.from(testInstant), runtimeObjectModel.toDate(testInstant));
+    }
+
+    @Test
+    public void testToInstant() {
+        assertNull(runtimeObjectModel.toInstant(null));
+        Date testDate = new Date();
+        assertEquals(testDate, Date.from(runtimeObjectModel.toInstant(testDate)));
+        Calendar testCalendar = Calendar.getInstance();
+        assertEquals(testCalendar.getTime(), Date.from(runtimeObjectModel.toInstant(testCalendar)));
+        Instant testInstant = Instant.now();
+        assertEquals(testInstant, runtimeObjectModel.toInstant(testInstant));
     }
 
     @Test
@@ -105,6 +119,7 @@ public class AbstractRuntimeObjectModelTest {
         assertFalse(runtimeObjectModel.isDate(null));
         assertTrue(runtimeObjectModel.isDate(new Date()));
         assertTrue(runtimeObjectModel.isDate(Calendar.getInstance()));
+        assertTrue(runtimeObjectModel.isDate(Instant.now()));
     }
 
     @Test

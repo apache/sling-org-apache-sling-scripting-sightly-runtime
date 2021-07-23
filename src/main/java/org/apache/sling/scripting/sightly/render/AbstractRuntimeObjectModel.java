@@ -16,6 +16,7 @@
  ******************************************************************************/
 package org.apache.sling.scripting.sightly.render;
 
+import java.time.Instant;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -40,7 +41,7 @@ public abstract class AbstractRuntimeObjectModel implements RuntimeObjectModel {
 
     @Override
     public boolean isDate(Object target) {
-        return (target instanceof Date || target instanceof Calendar);
+        return (target instanceof Date || target instanceof Calendar || target instanceof Instant);
     }
 
     @Override
@@ -92,6 +93,20 @@ public abstract class AbstractRuntimeObjectModel implements RuntimeObjectModel {
             return (Date)object;
         } else if (object instanceof Calendar) {
             return ((Calendar)object).getTime();
+        } else if (object instanceof Instant) {
+            return Date.from((Instant) object);
+        }
+        return null;
+    }
+
+    @Override
+    public Instant toInstant(Object object) {
+        if (object instanceof Date) {
+            return ((Date)object).toInstant();
+        } else if (object instanceof Calendar) {
+            return (((Calendar)object)).toInstant();
+        } else if (object instanceof Instant) {
+            return (Instant) object;
         }
         return null;
     }
