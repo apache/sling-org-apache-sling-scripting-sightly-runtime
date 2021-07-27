@@ -122,6 +122,9 @@ public final class ObjectModel {
                     resolved = ((Map) target).get(property);
                 }
                 if (resolved == null) {
+                    resolved = getEnumValue(target, propertyName);
+                }
+                if (resolved == null) {
                     resolved = getField(target, propertyName);
                 }
                 if (resolved == null) {
@@ -364,6 +367,18 @@ public final class ObjectModel {
         if (object == null) {
             return null;
         }
+
+        // special handing for enum object
+        if (object instanceof Class && ((Class<?>)object).isEnum()) {
+            Class<?> cls = (Class<?>)object;
+            if (index >= 0 && index < cls.getEnumConstants().length) {
+                //find the enum constant whose ordinal matches the requested index
+                return cls.getEnumConstants()[index];
+            } else {
+                return null;
+            }
+        }
+
         Class<?> cls = object.getClass();
         if (cls.isArray() && index >= 0 && index < Array.getLength(object)) {
             return Array.get(object, index);
@@ -386,7 +401,15 @@ public final class ObjectModel {
         if (object == null || StringUtils.isEmpty(fieldName)) {
             return null;
         }
-        Class<?> cls = object.getClass();
+
+        Class<?> cls;
+        // special handing for enum object
+        if (object instanceof Class && ((Class<?>)object).isEnum()) {
+            cls = (Class<?>)object; 
+        } else {
+            cls = object.getClass();
+        }
+
         if (cls.isArray() && "length".equals(fieldName)) {
             return Array.getLength(object);
         }
@@ -415,7 +438,13 @@ public final class ObjectModel {
         if (object == null || StringUtils.isEmpty(methodName)) {
             return null;
         }
-        Class<?> cls = object.getClass();
+        Class<?> cls;
+        // special handing for enum object
+        if (object instanceof Class && ((Class<?>)object).isEnum()) {
+            cls = (Class<?>)object; 
+        } else {
+            cls = object.getClass();
+        }
         Method method = findBeanMethod(cls, methodName);
         if (method != null) {
             try {
@@ -423,6 +452,30 @@ public final class ObjectModel {
                 return method.invoke(object);
             } catch (Exception e) {
                 LOGGER.error("Cannot access method " + methodName + " on object " + object.toString(), e);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Given an {@code object}, this method will return the value of the enum value identified by {@code valueName}.
+     *
+     * @param object    the target object
+     * @param valueName the name of the enum value
+     * @return the value of the enum or {@code null} if the enum was not found
+     */
+    public static Object getEnumValue(Object object, String valueName) {
+        if (object == null || StringUtils.isEmpty(valueName)) {
+            return null;
+        }
+        if (object instanceof Class && ((Class<?>)object).isEnum()) {
+            try {
+                @SuppressWarnings({ "unchecked", "rawtypes" })
+                Enum<?> value = Enum.valueOf((Class<Enum>)object, valueName);
+                return value;
+            } catch (IllegalArgumentException e) {
+                // not a valid enum value?
+                return null;
             }
         }
         return null;
