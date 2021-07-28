@@ -32,6 +32,8 @@ import java.util.Vector;
 import org.apache.sling.scripting.sightly.render.testobjects.Person;
 import org.apache.sling.scripting.sightly.render.testobjects.TestEnum;
 import org.apache.sling.scripting.sightly.render.testobjects.internal.AdultFactory;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -150,7 +152,7 @@ public class ObjectModelTest {
         assertEquals(testList, ObjectModel.toCollection(testArray));
         assertEquals(testList, ObjectModel.toCollection(testPrimitiveArray));
         assertEquals(testList, ObjectModel.toCollection(testList));
-        assertEquals(map.keySet(), ObjectModel.toCollection(map));
+        MatcherAssert.assertThat(ObjectModel.toCollection(map), Matchers.contains(map.keySet().toArray()));
         Vector<Integer> vector = new Vector<>(testList);
         assertEquals(testList, ObjectModel.toCollection(vector.elements()));
         assertEquals(testList, ObjectModel.toCollection(testList.iterator()));
