@@ -246,7 +246,7 @@ public final class ObjectModel {
                 return ((Enum) object).name();
             } else if (object instanceof Optional) {
                 return toString(((Optional) object).orElse(EMPTY_STRING));
-            } else if (object.getClass().isArray() || object instanceof Collection || object instanceof Enumeration || object instanceof Iterator || object instanceof Iterator) {
+            } else if (object.getClass().isArray() || object instanceof Collection || object instanceof Enumeration || object instanceof Iterator || object instanceof Iterable) {
                 Collection<?> col = toCollection(object);
                 output = collectionToString(col);
             } else {
