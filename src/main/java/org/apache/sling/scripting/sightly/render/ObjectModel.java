@@ -231,8 +231,9 @@ public final class ObjectModel {
      *     <li>if the {@code object} is an instance of a {@link String} the object itself will be returned</li>
      *     <li>if the object is a primitive (see {@link #isPrimitive(Object)}), its {@link String} representation will be returned</li>
      *     <li>if the object is an {@link Enum} its name will be returned (see {@link Enum#name()})</li>
-     *     <li>otherwise an attempt to convert the object to a {@link Collection} will be made and then the output of
+     *     <li>if the object is a collection an attempt to convert the object to a {@link Collection} will be made and then the output of
      *     {@link #collectionToString(Collection)} will be returned</li>
+     *     <li>otherwise {@code object.toString()} is returned</li>
      * </ul>
      *
      * @param object the target object
@@ -249,17 +250,18 @@ public final class ObjectModel {
                 return ((Enum) object).name();
             } else if (object instanceof Optional) {
                 return toString(((Optional) object).orElse(EMPTY_STRING));
-            }
-            else {
+            } else if (object.getClass().isArray() || object instanceof Collection || object instanceof Enumeration || object instanceof Iterator || object instanceof Iterable) {
                 Collection<?> col = toCollection(object);
                 output = collectionToString(col);
+            } else {
+                output = object.toString();
             }
         }
         return output;
     }
 
     /**
-     * Forces the conversion of the passed {@code object} to a collection, according to the following rules:
+     * Forces the conversion of the passed {@code object} to an immutable collection, according to the following rules:
      *
      * <ul>
      *     <li>if the {@code object} is {@code null} an empty collection will be returned</li>
@@ -269,40 +271,41 @@ public final class ObjectModel {
      *     <li>if the {@code object} is an instance of an {@link Enumeration} a list transformation will be returned</li>
      *     <li>if the {@code object} is an instance of an {@link Iterator} or {@link Iterable} the result of {@link #fromIterator(Iterator)}
      *     will be returned</li>
-     *     <li>if the {@code object} is an instance of a {@link String} or {@link Number} a {@link Collection} containing only this
-     *     object will be returned</li>
-     *     <li>any other case not covered by the previous rules will result in an empty {@link Collection}</li>
+     *     <li>otherwise the {@code object} is wrapped in a single item list</li>
      * </ul>
      *
      * @param object the target object
-     * @return the collection representation of the object
+     * @return the immutable collection representation of the object
      */
     public static Collection<Object> toCollection(Object object) {
         if (object == null) {
             return Collections.emptyList();
         }
         if (object instanceof Object[]) {
-            return Arrays.asList((Object[]) object);
+            return Collections.unmodifiableList(Arrays.asList((Object[]) object));
         }
         if (object.getClass().isArray()) {
             int length = Array.getLength(object);
-            Collection<Object> list = new ArrayList<>();
+            List<Object> list = new ArrayList<>();
             for (int i = 0; i < length; i++) {
                 list.add(Array.get(object, i));
             }
-            return list;
+            return Collections.unmodifiableList(list);
         }
         if (object instanceof Optional) {
             return toCollection(((Optional) object).orElse(Collections.emptyList()));
         }
+        if (object instanceof List) {
+            return Collections.unmodifiableList((List<Object>) object);
+        }
         if (object instanceof Collection) {
-            return (Collection<Object>) object;
+            return Collections.unmodifiableCollection((Collection<Object>) object);
         }
         if (object instanceof Map) {
-            return ((Map) object).keySet();
+            return Collections.unmodifiableCollection(((Map) object).keySet());
         }
         if (object instanceof Enumeration) {
-            return Collections.list((Enumeration<Object>) object);
+            return Collections.unmodifiableList(Collections.list((Enumeration<Object>) object));
         }
         if (object instanceof Iterator) {
             return fromIterator((Iterator<Object>) object);
@@ -311,12 +314,7 @@ public final class ObjectModel {
             Iterable<Object> iterable = (Iterable<Object>) object;
             return fromIterator(iterable.iterator());
         }
-        if (object instanceof String || object instanceof Number) {
-            Collection<Object> list = new ArrayList<>();
-            list.add(object);
-            return list;
-        }
-        return Collections.emptyList();
+        return Collections.singletonList(object);
     }
 
     /**
@@ -342,17 +340,15 @@ public final class ObjectModel {
      * Given an {@code iterator}, this method will return a {@link Collection}.
      *
      * @param iterator the iterator to be transformed into a {@code collection}
-     * @return a collection with the iterator's elements
+     * @return an immutable collection with the iterator's elements
      */
     public static Collection<Object> fromIterator(Iterator<Object> iterator) {
         if (iterator == null) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         ArrayList<Object> result = new ArrayList<>();
-        while (iterator.hasNext()) {
-            result.add(iterator.next());
-        }
-        return result;
+        iterator.forEachRemaining(result::add);
+        return Collections.unmodifiableList(result);
     }
 
     /**

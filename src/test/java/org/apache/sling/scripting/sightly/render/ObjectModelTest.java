@@ -18,6 +18,8 @@
  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 package org.apache.sling.scripting.sightly.render;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,6 +35,8 @@ import org.apache.sling.scripting.sightly.render.testobjects.Person;
 import org.apache.sling.scripting.sightly.render.testobjects.TestEnum;
 import org.apache.sling.scripting.sightly.render.testobjects.TestEnum2;
 import org.apache.sling.scripting.sightly.render.testobjects.internal.AdultFactory;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -116,7 +120,7 @@ public class ObjectModelTest {
     }
 
     @Test
-    public void testToString() {
+    public void testToString() throws URISyntaxException {
         assertEquals("", ObjectModel.toString(null));
         assertEquals("1", ObjectModel.toString("1"));
         assertEquals("1", ObjectModel.toString(1));
@@ -127,6 +131,7 @@ public class ObjectModelTest {
         assertEquals("1,2,3", ObjectModel.toString(testList));
         assertEquals("1,2,3", ObjectModel.toString(testArray));
         assertEquals("1,2,3", ObjectModel.toString(testPrimitiveArray));
+        assertEquals("http://localhost/test", ObjectModel.toString(new URI("http://localhost/test")));
 
         assertEquals("", ObjectModel.toString(Optional.empty()));
         assertEquals("false", ObjectModel.toString(Optional.of(false)));
@@ -140,7 +145,8 @@ public class ObjectModelTest {
     @Test
     public void testToCollection() {
         assertTrue(ObjectModel.toCollection(null).isEmpty());
-        assertTrue(ObjectModel.toCollection(new StringBuilder()).isEmpty());
+        StringBuilder sb = new StringBuilder();
+        assertEquals(Collections.singletonList(sb), ObjectModel.toCollection(sb));
         Integer[] testArray = new Integer[] {1, 2, 3};
         int[] testPrimitiveArray = new int[] {1, 2, 3};
         List<Integer> testList = Arrays.asList(testArray);
@@ -151,7 +157,7 @@ public class ObjectModelTest {
         assertEquals(testList, ObjectModel.toCollection(testArray));
         assertEquals(testList, ObjectModel.toCollection(testPrimitiveArray));
         assertEquals(testList, ObjectModel.toCollection(testList));
-        assertEquals(map.keySet(), ObjectModel.toCollection(map));
+        MatcherAssert.assertThat(ObjectModel.toCollection(map), Matchers.contains(map.keySet().toArray()));
         Vector<Integer> vector = new Vector<>(testList);
         assertEquals(testList, ObjectModel.toCollection(vector.elements()));
         assertEquals(testList, ObjectModel.toCollection(testList.iterator()));
