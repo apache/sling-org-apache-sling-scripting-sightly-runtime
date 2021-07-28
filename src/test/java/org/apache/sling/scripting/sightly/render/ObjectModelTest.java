@@ -138,7 +138,8 @@ public class ObjectModelTest {
     @Test
     public void testToCollection() {
         assertTrue(ObjectModel.toCollection(null).isEmpty());
-        assertTrue(ObjectModel.toCollection(new StringBuilder()).isEmpty());
+        StringBuilder sb = new StringBuilder();
+        assertEquals(Collections.singletonList(sb), ObjectModel.toCollection(sb));
         Integer[] testArray = new Integer[] {1, 2, 3};
         int[] testPrimitiveArray = new int[] {1, 2, 3};
         List<Integer> testList = Arrays.asList(testArray);

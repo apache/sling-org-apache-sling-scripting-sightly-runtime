@@ -266,9 +266,7 @@ public final class ObjectModel {
      *     <li>if the {@code object} is an instance of an {@link Enumeration} a list transformation will be returned</li>
      *     <li>if the {@code object} is an instance of an {@link Iterator} or {@link Iterable} the result of {@link #fromIterator(Iterator)}
      *     will be returned</li>
-     *     <li>if the {@code object} is an instance of a {@link String} or {@link Number} a {@link Collection} containing only this
-     *     object will be returned</li>
-     *     <li>any other case not covered by the previous rules will result in an empty {@link Collection}</li>
+     *     <li>otherwise the {@code object} is wrapped in a single item list</li>
      * </ul>
      *
      * @param object the target object
@@ -308,12 +306,7 @@ public final class ObjectModel {
             Iterable<Object> iterable = (Iterable<Object>) object;
             return fromIterator(iterable.iterator());
         }
-        if (object instanceof String || object instanceof Number) {
-            Collection<Object> list = new ArrayList<>();
-            list.add(object);
-            return list;
-        }
-        return Collections.emptyList();
+        return Collections.singletonList(object);
     }
 
     /**
