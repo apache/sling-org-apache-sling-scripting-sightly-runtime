@@ -18,6 +18,8 @@
  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 package org.apache.sling.scripting.sightly.render;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -114,7 +116,7 @@ public class ObjectModelTest {
     }
 
     @Test
-    public void testToString() {
+    public void testToString() throws URISyntaxException {
         assertEquals("", ObjectModel.toString(null));
         assertEquals("1", ObjectModel.toString("1"));
         assertEquals("1", ObjectModel.toString(1));
@@ -125,6 +127,7 @@ public class ObjectModelTest {
         assertEquals("1,2,3", ObjectModel.toString(testList));
         assertEquals("1,2,3", ObjectModel.toString(testArray));
         assertEquals("1,2,3", ObjectModel.toString(testPrimitiveArray));
+        assertEquals("http://localhost/test", ObjectModel.toString(new URI("http://localhost/test")));
 
         assertEquals("", ObjectModel.toString(Optional.empty()));
         assertEquals("false", ObjectModel.toString(Optional.of(false)));

@@ -228,8 +228,9 @@ public final class ObjectModel {
      *     <li>if the {@code object} is an instance of a {@link String} the object itself will be returned</li>
      *     <li>if the object is a primitive (see {@link #isPrimitive(Object)}), its {@link String} representation will be returned</li>
      *     <li>if the object is an {@link Enum} its name will be returned (see {@link Enum#name()})</li>
-     *     <li>otherwise an attempt to convert the object to a {@link Collection} will be made and then the output of
+     *     <li>if the object is a collection an attempt to convert the object to a {@link Collection} will be made and then the output of
      *     {@link #collectionToString(Collection)} will be returned</li>
+     *     <li>otherwise {@code object.toString()} is returned</li>
      * </ul>
      *
      * @param object the target object
@@ -246,10 +247,11 @@ public final class ObjectModel {
                 return ((Enum) object).name();
             } else if (object instanceof Optional) {
                 return toString(((Optional) object).orElse(EMPTY_STRING));
-            }
-            else {
+            } else if (object.getClass().isArray() || object instanceof Collection || object instanceof Enumeration || object instanceof Iterator || object instanceof Iterable) {
                 Collection<?> col = toCollection(object);
                 output = collectionToString(col);
+            } else {
+                output = object.toString();
             }
         }
         return output;
