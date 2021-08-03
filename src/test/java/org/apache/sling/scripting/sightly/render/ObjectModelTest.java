@@ -33,11 +33,13 @@ import java.util.Vector;
 
 import org.apache.sling.scripting.sightly.render.testobjects.Person;
 import org.apache.sling.scripting.sightly.render.testobjects.TestEnum;
+import org.apache.sling.scripting.sightly.render.testobjects.TestEnum2;
 import org.apache.sling.scripting.sightly.render.testobjects.internal.AdultFactory;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -238,6 +240,35 @@ public class ObjectModelTest {
 
     }
 
+    /**
+     * Verify that values of an enumeration can be resolved
+     * by their name
+     */
+    @Test
+    public void testResolvePropertyFromEnum() {
+        assertEquals(TestEnum2.ONE, ObjectModel.resolveProperty(TestEnum2.class, "ONE"));
+        assertEquals(TestEnum2.TWO, ObjectModel.resolveProperty(TestEnum2.class, "TWO"));
+        assertNull(ObjectModel.resolveProperty(TestEnum.class, "INVALID"));
+
+        assertEquals("Expected to be able to access public static final constants.",
+                TestEnum2.STR_CONSTANT,
+                ObjectModel.resolveProperty(TestEnum2.class, "STR_CONSTANT"));
+    }
+
+    /**
+     * Verify that values of an static method of an enumeration can be invoked
+     */
+    @Test
+    public void testResolveMethodFromEnum() {
+        Object value = ObjectModel.resolveProperty(TestEnum2.class, "values");
+        assertNotNull(value);
+        assertTrue(value.getClass().isArray());
+        assertEquals(TestEnum2.class, value.getClass().getComponentType());
+        assertArrayEquals(TestEnum2.values(), (TestEnum2[])value);
+
+        assertEquals("value from static method", ObjectModel.resolveProperty(TestEnum2.class, "someStaticMethod1"));
+    }
+
     @Test
     public void testGetIndex() {
         assertNull(ObjectModel.getIndex(null, 0));
@@ -255,6 +286,19 @@ public class ObjectModelTest {
         }};
         assertNull(ObjectModel.getIndex(stringMap, 1));
         assertNull(ObjectModel.getIndex(stringMap, 2));
+    }
+
+    /**
+     * Verify that values of an enumeration can be resolved
+     * by their ordinal value
+     */
+    @Test
+    public void testGetIndexFromEnum() {
+        assertEquals(TestEnum2.ONE, ObjectModel.getIndex(TestEnum2.class, 0));
+        Object two = ObjectModel.getIndex(TestEnum2.class, 1);
+        assertEquals(TestEnum2.TWO, two);
+        assertEquals(TestEnum2.TWO.ordinal(), ((Enum<?>)two).ordinal());
+        assertNull(ObjectModel.getIndex(TestEnum.class, 100));
     }
 
     @Test
