@@ -1,19 +1,21 @@
-/*******************************************************************************
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.apache.sling.scripting.sightly.render;
 
 import java.time.Instant;
@@ -54,23 +56,29 @@ public class AbstractRuntimeObjectModelTest {
         assertEquals(2, runtimeObjectModel.resolveProperty(testList, 1));
         assertNull(runtimeObjectModel.resolveProperty(testList, 3));
         assertNull(runtimeObjectModel.resolveProperty(testList, -1));
-        Map<String, Integer> map = new HashMap<String, Integer>() {{
-            put("one", 1);
-            put("two", 2);
-        }};
+        Map<String, Integer> map = new HashMap<String, Integer>() {
+            {
+                put("one", 1);
+                put("two", 2);
+            }
+        };
         assertEquals(1, runtimeObjectModel.resolveProperty(map, "one"));
         assertNull(runtimeObjectModel.resolveProperty(map, null));
         assertNull(runtimeObjectModel.resolveProperty(map, ""));
-        Map<Integer, String> stringMap = new HashMap<Integer, String>(){{
-            put(1, "one");
-            put(2, "two");
-        }};
+        Map<Integer, String> stringMap = new HashMap<Integer, String>() {
+            {
+                put(1, "one");
+                put(2, "two");
+            }
+        };
         assertEquals("one", runtimeObjectModel.resolveProperty(stringMap, 1));
         assertEquals("two", runtimeObjectModel.resolveProperty(stringMap, 2));
-        Map<String, String> strings = new HashMap<String, String>(){{
-            put("a", "one");
-            put("b", "two");
-        }};
+        Map<String, String> strings = new HashMap<String, String>() {
+            {
+                put("a", "one");
+                put("b", "two");
+            }
+        };
         Record<String> record = new Record<String>() {
             @Override
             public String getProperty(String name) {
@@ -137,10 +145,12 @@ public class AbstractRuntimeObjectModelTest {
         assertTrue(runtimeObjectModel.toCollection(null).isEmpty());
         Record<String> record = new Record<String>() {
 
-            private Map<String, String> properties = new HashMap<String, String>() {{
-                put("a", "1");
-                put("b", "2");
-            }};
+            private Map<String, String> properties = new HashMap<String, String>() {
+                {
+                    put("a", "1");
+                    put("b", "2");
+                }
+            };
 
             @Override
             public String getProperty(String name) {
@@ -160,10 +170,12 @@ public class AbstractRuntimeObjectModelTest {
 
     @Test
     public void testToMap() {
-        final Map<String, String> properties = new HashMap<String, String>() {{
-            put("a", "1");
-            put("b", "2");
-        }};
+        final Map<String, String> properties = new HashMap<String, String>() {
+            {
+                put("a", "1");
+                put("b", "2");
+            }
+        };
         assertEquals(properties, runtimeObjectModel.toMap(properties));
         Record<String> record = new Record<String>() {
             @Override
@@ -179,5 +191,4 @@ public class AbstractRuntimeObjectModelTest {
         assertEquals(properties, runtimeObjectModel.toMap(record));
         assertTrue(runtimeObjectModel.toMap(null).isEmpty());
     }
-
 }
