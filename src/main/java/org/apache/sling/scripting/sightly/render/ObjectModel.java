@@ -1,21 +1,21 @@
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- ~ Licensed to the Apache Software Foundation (ASF) under one
- ~ or more contributor license agreements.  See the NOTICE file
- ~ distributed with this work for additional information
- ~ regarding copyright ownership.  The ASF licenses this file
- ~ to you under the Apache License, Version 2.0 (the
- ~ "License"); you may not use this file except in compliance
- ~ with the License.  You may obtain a copy of the License at
- ~
- ~   http://www.apache.org/licenses/LICENSE-2.0
- ~
- ~ Unless required by applicable law or agreed to in writing,
- ~ software distributed under the License is distributed on an
- ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- ~ KIND, either express or implied.  See the License for the
- ~ specific language governing permissions and limitations
- ~ under the License.
- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.apache.sling.scripting.sightly.render;
 
 import java.lang.reflect.Array;
@@ -65,7 +65,6 @@ public final class ObjectModel {
         primitivesBuilder.add(Void.class);
         PRIMITIVE_CLASSES = Collections.unmodifiableSet(primitivesBuilder);
     }
-
 
     private static final String TO_STRING_METHOD = "toString";
 
@@ -250,7 +249,11 @@ public final class ObjectModel {
                 return ((Enum) object).name();
             } else if (object instanceof Optional) {
                 return toString(((Optional) object).orElse(EMPTY_STRING));
-            } else if (object.getClass().isArray() || object instanceof Collection || object instanceof Enumeration || object instanceof Iterator || object instanceof Iterable) {
+            } else if (object.getClass().isArray()
+                    || object instanceof Collection
+                    || object instanceof Enumeration
+                    || object instanceof Iterator
+                    || object instanceof Iterable) {
                 Collection<?> col = toCollection(object);
                 output = collectionToString(col);
             } else {
@@ -365,10 +368,10 @@ public final class ObjectModel {
         }
 
         // special handing for enum object
-        if (object instanceof Class && ((Class<?>)object).isEnum()) {
-            Class<?> cls = (Class<?>)object;
+        if (object instanceof Class && ((Class<?>) object).isEnum()) {
+            Class<?> cls = (Class<?>) object;
             if (index >= 0 && index < cls.getEnumConstants().length) {
-                //find the enum constant whose ordinal matches the requested index
+                // find the enum constant whose ordinal matches the requested index
                 return cls.getEnumConstants()[index];
             } else {
                 return null;
@@ -400,8 +403,8 @@ public final class ObjectModel {
 
         Class<?> cls;
         // special handing for enum object
-        if (object instanceof Class && ((Class<?>)object).isEnum()) {
-            cls = (Class<?>)object; 
+        if (object instanceof Class && ((Class<?>) object).isEnum()) {
+            cls = (Class<?>) object;
         } else {
             cls = object.getClass();
         }
@@ -409,12 +412,11 @@ public final class ObjectModel {
         if (cls.isArray() && "length".equals(fieldName)) {
             return Array.getLength(object);
         }
-        for (Field field : cls.getFields()){
-            if (field.getName().equals(fieldName)){
+        for (Field field : cls.getFields()) {
+            if (field.getName().equals(fieldName)) {
                 try {
                     return field.get(object);
-                }
-                catch (IllegalAccessException e) {
+                } catch (IllegalAccessException e) {
                     return null;
                 }
             }
@@ -436,8 +438,8 @@ public final class ObjectModel {
         }
         Class<?> cls;
         // special handing for enum object
-        if (object instanceof Class && ((Class<?>)object).isEnum()) {
-            cls = (Class<?>)object; 
+        if (object instanceof Class && ((Class<?>) object).isEnum()) {
+            cls = (Class<?>) object;
         } else {
             cls = object.getClass();
         }
@@ -464,10 +466,10 @@ public final class ObjectModel {
         if (object == null || StringUtils.isEmpty(valueName)) {
             return null;
         }
-        if (object instanceof Class && ((Class<?>)object).isEnum()) {
+        if (object instanceof Class && ((Class<?>) object).isEnum()) {
             try {
-                @SuppressWarnings({ "unchecked", "rawtypes" })
-                Enum<?> value = Enum.valueOf((Class<Enum>)object, valueName);
+                @SuppressWarnings({"unchecked", "rawtypes"})
+                Enum<?> value = Enum.valueOf((Class<Enum>) object, valueName);
                 return value;
             } catch (IllegalArgumentException e) {
                 // not a valid enum value?
@@ -498,7 +500,9 @@ public final class ObjectModel {
         for (Method method : publicMethods) {
             if (method.getParameterTypes().length == 0) {
                 String methodName = method.getName();
-                if (baseName.equals(methodName) || ("get" + capitalized).equals(methodName) || ("is" + capitalized).equals(methodName)) {
+                if (baseName.equals(methodName)
+                        || ("get" + capitalized).equals(methodName)
+                        || ("is" + capitalized).equals(methodName)) {
                     if (isMethodAllowed(method)) {
                         return method;
                     }
@@ -552,6 +556,4 @@ public final class ObjectModel {
         }
         return null;
     }
-
-
 }

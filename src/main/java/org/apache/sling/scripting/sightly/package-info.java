@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-
 @Version("2.0.0")
 package org.apache.sling.scripting.sightly;
 
